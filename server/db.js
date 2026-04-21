@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import bcrypt from 'bcryptjs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -63,5 +64,23 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_bookings_service_center_id ON bookings(service_center_id);
   CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
 `);
+
+// --- Seed default admin account ---
+const adminExists = db.prepare('SELECT id FROM users WHERE email = ?').get('admin@vsrs.com');
+if (!adminExists) {
+  const hashedPassword = bcrypt.hashSync('admin123', 10);
+  db.prepare(`
+    INSERT INTO users (id, name, email, password_hash, phone, role)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run(
+    `admin_${Date.now()}`,
+    'System Admin',
+    'admin@vsrs.com',
+    hashedPassword,
+    '',
+    'admin'
+  );
+  console.log('✅ Default admin account seeded (admin@vsrs.com / admin123)');
+}
 
 export default db;
