@@ -233,7 +233,7 @@ npm install          # Install dependencies
 npm run dev          # Start both frontend (port 5173) and backend (port 3001)
 ```
 
-### Production
+### Production (Local)
 ```bash
 npm start            # Builds frontend + starts Express serving everything on port 3001
 ```
@@ -250,7 +250,73 @@ DB_PATH=./server/database.sqlite
 
 ---
 
-## 9. Viewing Database Records
+## 9. Deployment
+
+### 9.1 Live URL
+
+> **🔗 https://vsrs.onrender.com**
+
+The application is deployed on **Render** (free tier) as a single Web Service that serves both the Express API and the Vite-built React frontend.
+
+### 9.2 Platform — Render
+
+| Setting | Value |
+|---------|-------|
+| **Platform** | [Render](https://render.com/) — Free Web Service |
+| **Region** | Auto-selected (closest to deployment) |
+| **Branch** | `master` |
+| **Runtime** | Node.js |
+| **Build Command** | `npm install && npm run build` |
+| **Start Command** | `node server/index.js` |
+| **Instance Type** | Free |
+| **Auto-Deploy** | Yes — every `git push origin master` triggers a new deploy |
+
+### 9.3 Production Environment Variables (on Render)
+
+| Variable | Value | Notes |
+|----------|-------|-------|
+| `PORT` | `10000` | Render assigns this port internally |
+| `NODE_ENV` | `production` | Enables production optimizations |
+| `JWT_SECRET` | *(strong random string)* | Different from dev secret |
+| `JWT_EXPIRES_IN` | `7d` | Same as development |
+| `DB_PATH` | `./server/database.sqlite` | SQLite file path |
+| `CORS_ORIGIN` | `https://vsrs.onrender.com` | Same-origin in production |
+
+### 9.4 How Deployment Works
+
+```
+1. Developer pushes code to GitHub (master branch)
+2. Render detects the push via webhook
+3. Render runs: npm install && npm run build
+   → Installs dependencies
+   → Vite compiles React app into dist/ folder
+4. Render runs: node server/index.js
+   → Express starts, serves API on /api/*
+   → Express serves built React app from dist/ for all other routes
+5. App is live at https://vsrs.onrender.com
+```
+
+### 9.5 Free Tier Limitations
+
+| Limitation | Impact |
+|------------|--------|
+| **Cold Start** | App sleeps after ~15 minutes of inactivity; first request takes ~30–50 seconds to wake up |
+| **Ephemeral Disk** | SQLite database resets on every redeploy (all user data is lost) |
+| **750 hours/month** | Sufficient for demo/academic use |
+
+> **Note:** For persistent data in production, a migration to PostgreSQL (Render offers a free managed PostgreSQL instance) would be recommended.
+
+### 9.6 GitHub Repository
+
+| Detail | Value |
+|--------|-------|
+| **Repository** | [github.com/THARSHAN719/VSRS](https://github.com/THARSHAN719/VSRS) |
+| **Branch** | `master` |
+| **README** | Includes live demo badge, tech stack, API docs, and deployment instructions |
+
+---
+
+## 10. Viewing Database Records
 
 ### Terminal Commands (from W22 folder)
 ```powershell
@@ -272,9 +338,9 @@ Install **"SQLite Viewer"** → open `server/database.sqlite` → browse tables 
 
 ---
 
-## 10. SDLC Model — Agile (Iterative Incremental)
+## 11. SDLC Model — Agile (Iterative Incremental)
 
-### 10.1 Why Agile?
+### 11.1 Why Agile?
 
 For VSRS — a multi-role web application with evolving requirements — the **Agile Model** is the most effective SDLC approach. Key reasons:
 
@@ -283,7 +349,7 @@ For VSRS — a multi-role web application with evolving requirements — the **A
 - **Continuous Testing:** Each sprint included testing (API validation, UI testing, route protection checks), catching bugs early rather than at the end.
 - **Stakeholder Feedback:** After each sprint, the working product was reviewed, and feedback directly shaped the next sprint's priorities.
 
-### 10.2 Sprint Breakdown (How VSRS Was Built)
+### 11.2 Sprint Breakdown (How VSRS Was Built)
 
 | Sprint | Duration | Deliverables |
 |--------|----------|-------------|
@@ -291,18 +357,19 @@ For VSRS — a multi-role web application with evolving requirements — the **A
 | **Sprint 2** — Backend Integration | Week 2 | Express.js server, SQLite database schema, REST API endpoints (auth, vehicles, bookings), JWT authentication, replaced localStorage with API calls |
 | **Sprint 3** — Role-Based Features | Week 2–3 | Customer dashboard, Service Center dashboard, Admin dashboard, role-based route protection (`ProtectedRoute`, `authorize` middleware) |
 | **Sprint 4** — Production Hardening | Week 3 | Helmet security headers, rate limiting, input validation & sanitization, database indexes, error boundaries, `.env` configuration, production build & static serving |
+| **Sprint 5** — Deployment | Week 4 | Deployed to Render (free tier), configured production environment variables, updated README with badges and live demo link, pushed to GitHub with deployment documentation |
 
-### 10.3 Agile Practices Used
+### 11.3 Agile Practices Used
 
 | Practice | How It Was Applied in VSRS |
 |----------|---------------------------|
 | **User Stories** | "As a customer, I can register my vehicle and book a service." "As a service center, I can accept/reject bookings and set price quotes." |
-| **Incremental Delivery** | Sprint 1 delivered a working UI; Sprint 2 added a real backend; Sprint 3 added multi-role features; Sprint 4 hardened everything for production |
-| **Continuous Integration** | Code committed to GitHub after each working increment |
+| **Incremental Delivery** | Sprint 1 delivered a working UI; Sprint 2 added a real backend; Sprint 3 added multi-role features; Sprint 4 hardened everything; Sprint 5 deployed to production |
+| **Continuous Integration** | Code committed to GitHub after each working increment; auto-deploy configured via Render |
 | **Refactoring** | Frontend was refactored from localStorage to API-driven data (AuthContext + DataContext) |
 | **Timeboxing** | Each sprint was ~1 week, ensuring consistent delivery pace |
 
-### 10.4 Agile vs Other SDLC Models — Why Agile Was Chosen
+### 11.4 Agile vs Other SDLC Models — Why Agile Was Chosen
 
 | Model | Pros | Cons (for VSRS) | Verdict |
 |-------|------|-----------------|---------|
@@ -312,7 +379,7 @@ For VSRS — a multi-role web application with evolving requirements — the **A
 | **RAD** | Fast prototyping | Sacrifices code quality for speed; VSRS needed proper security and architecture | ❌ Quality concerns |
 | **Agile** | Iterative, flexible, delivers working software every sprint | Requires discipline in sprint planning | ✅ **Best fit** |
 
-### 10.5 Agile Workflow Diagram
+### 11.5 Agile Workflow Diagram
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -328,15 +395,19 @@ For VSRS — a multi-role web application with evolving requirements — the **A
 │                   │ FEEDBACK │    │          │              │
 │                   └──────────┘    └──────────┘              │
 │                                                              │
-│              ↻ Repeat for each Sprint (1–4)                  │
+│              ↻ Repeat for each Sprint (1–5)                  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## admin credentials
+## Admin Credentials
 
-Email: [admin@vsrs.com]
-Password: [admin123]
+| Field | Value |
+|-------|-------|
+| **Email** | admin@vsrs.com |
+| **Password** | admin123 |
 
-*Last Updated: March 31, 2026*
+---
+
+*Last Updated: April 21, 2026*
