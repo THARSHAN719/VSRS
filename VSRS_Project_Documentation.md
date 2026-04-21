@@ -272,6 +272,68 @@ Install **"SQLite Viewer"** → open `server/database.sqlite` → browse tables 
 
 ---
 
+## 10. SDLC Model — Agile (Iterative Incremental)
+
+### 10.1 Why Agile?
+
+For VSRS — a multi-role web application with evolving requirements — the **Agile Model** is the most effective SDLC approach. Key reasons:
+
+- **Iterative Development:** The project was built in functional increments (sprints), delivering a working product at each stage — starting with the frontend UI, then adding a backend, then hardening for production.
+- **Flexibility for Changes:** Requirements evolved during development — e.g., adding role-based access control, switching from localStorage to a real database, adding security headers. Agile accommodates these changes without derailing the timeline.
+- **Continuous Testing:** Each sprint included testing (API validation, UI testing, route protection checks), catching bugs early rather than at the end.
+- **Stakeholder Feedback:** After each sprint, the working product was reviewed, and feedback directly shaped the next sprint's priorities.
+
+### 10.2 Sprint Breakdown (How VSRS Was Built)
+
+| Sprint | Duration | Deliverables |
+|--------|----------|-------------|
+| **Sprint 1** — Frontend Foundation | Week 1 | React + Vite setup, Tailwind CSS styling, page components (Home, Login, Register, Dashboard), client-side routing with React Router v6 |
+| **Sprint 2** — Backend Integration | Week 2 | Express.js server, SQLite database schema, REST API endpoints (auth, vehicles, bookings), JWT authentication, replaced localStorage with API calls |
+| **Sprint 3** — Role-Based Features | Week 2–3 | Customer dashboard, Service Center dashboard, Admin dashboard, role-based route protection (`ProtectedRoute`, `authorize` middleware) |
+| **Sprint 4** — Production Hardening | Week 3 | Helmet security headers, rate limiting, input validation & sanitization, database indexes, error boundaries, `.env` configuration, production build & static serving |
+
+### 10.3 Agile Practices Used
+
+| Practice | How It Was Applied in VSRS |
+|----------|---------------------------|
+| **User Stories** | "As a customer, I can register my vehicle and book a service." "As a service center, I can accept/reject bookings and set price quotes." |
+| **Incremental Delivery** | Sprint 1 delivered a working UI; Sprint 2 added a real backend; Sprint 3 added multi-role features; Sprint 4 hardened everything for production |
+| **Continuous Integration** | Code committed to GitHub after each working increment |
+| **Refactoring** | Frontend was refactored from localStorage to API-driven data (AuthContext + DataContext) |
+| **Timeboxing** | Each sprint was ~1 week, ensuring consistent delivery pace |
+
+### 10.4 Agile vs Other SDLC Models — Why Agile Was Chosen
+
+| Model | Pros | Cons (for VSRS) | Verdict |
+|-------|------|-----------------|---------|
+| **Waterfall** | Simple, linear, well-documented | No flexibility — can't adapt when requirements change (e.g., adding security layers mid-project) | ❌ Too rigid |
+| **V-Model** | Strong testing focus | Requires complete requirements upfront; VSRS requirements evolved sprint-to-sprint | ❌ Not suitable |
+| **Spiral** | Good for risk-heavy projects | Overkill for a web app; excessive overhead for a small team | ❌ Too complex |
+| **RAD** | Fast prototyping | Sacrifices code quality for speed; VSRS needed proper security and architecture | ❌ Quality concerns |
+| **Agile** | Iterative, flexible, delivers working software every sprint | Requires discipline in sprint planning | ✅ **Best fit** |
+
+### 10.5 Agile Workflow Diagram
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                      AGILE SPRINT CYCLE                      │
+│                                                              │
+│   ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌───────┐ │
+│   │  PLAN    │───→│  DESIGN  │───→│  BUILD   │───→│ TEST  │ │
+│   │          │    │          │    │  & CODE  │    │       │ │
+│   └──────────┘    └──────────┘    └──────────┘    └───┬───┘ │
+│        ↑                                              │     │
+│        │          ┌──────────┐    ┌──────────┐        │     │
+│        └──────────│  REVIEW  │←───│  DEPLOY  │←───────┘     │
+│                   │ FEEDBACK │    │          │              │
+│                   └──────────┘    └──────────┘              │
+│                                                              │
+│              ↻ Repeat for each Sprint (1–4)                  │
+└──────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## admin credentials
 
 Email: [admin@vsrs.com]
